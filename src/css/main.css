@@ -2,6 +2,7 @@ body {
     padding: 0;
     margin: 0;
     font-size: 16px;
+    padding-bottom: 32px;
 }
 
 body * {
@@ -53,6 +54,12 @@ body * {
     border: none;
     padding: 0;
     cursor: pointer;
+    margin: 0 auto;
+    display: block;
+}
+
+.hidden {
+    display: none !important
 }
 
 
@@ -63,6 +70,7 @@ body * {
 
 .images__cont {
     margin-top: 32px;
+    margin-bottom: 32px;
     gap: 24px;
     display: flex;
     flex-wrap: wrap;
@@ -124,9 +132,10 @@ body * {
     border: 5px solid #646464;
     border-bottom-color: #FF3D00;
     border-radius: 50%;
-    display: inline-block;
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
+    margin-top: 12px;
+    display: block;
     }
 
     @keyframes rotation {

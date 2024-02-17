@@ -1,58 +1,65 @@
 import {renderFunc} from "./render-functions";
 
-export const pixebayApi = (word, iziToast) => {
+let page = 1;
+const preloader = document.querySelector('.loader');
+
+export const pixebayApi = async (word, iziToast, Axios, type, loadMoreBtn) => {
     const imgCont = document.querySelector('.images__cont');
 
-    imgCont.innerHTML = '<span class="loader"></span>';
+    preloader.classList.remove('hidden');
 
+    if(type === 'loadFirst') {
+        imgCont.innerHTML = '';
+        page = 1;
+        loadMoreBtn.classList.add('hidden');
+    }
 
     const URL = 'https://pixabay.com/api/';
-
-    const options = {
-        method: "GET"
-    };
-    
+    const PAGESIZE = 15;
     const searchParams = new URLSearchParams({
         key: '42320940-042fd388efe736bb4087979b1',
         q: word,
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
+        per_page: PAGESIZE,
+        page: page,
     });
 
     const paramsUrl = `${URL}?${searchParams}`;
-    
-    fetch(paramsUrl, options)
-    .then(response => {
-        if (!response.ok) {
-          throw new Error(response.status);
-        }
-        return response.json();
-      })
-      .then(data => {
-        if(data.total === 0) {
-            imgCont.innerHTML = '';
-            iziToast.show({
-                message: 'Sorry, there are no images matching your search query. Please try again!',
-                position: 'topRight',
-                backgroundColor: 'red',
-                messageColor: 'white',
-                theme: 'dark',
-                iconUrl: '/goit-js-hw-11/assets/error.svg'
-            });
-        } else {
-            renderFunc(data);
-        } 
-      })
-      .catch(error => {
+
+    const response = await Axios.get(paramsUrl);
+    const totalItems = response.data.totalHits;
+
+    if(totalItems === 0) {
         imgCont.innerHTML = '';
+        loadMoreBtn.classList.add('hidden');
         iziToast.show({
-            message: error,
+            message: 'Sorry, there are no images matching your search query. Please try again!',
             position: 'topRight',
             backgroundColor: 'red',
             messageColor: 'white',
             theme: 'dark',
-            iconUrl: '/goit-js-hw-11/assets/error.svg'
         });
-    });
+    } else {
+        const allPages = Math.ceil(totalItems / PAGESIZE);
+
+        if(page >= allPages) {
+            loadMoreBtn.classList.add('hidden');
+            iziToast.show({
+                message: "We're sorry, but you've reached the end of search results.",
+                position: 'topRight',
+                backgroundColor: 'blue',
+                messageColor: 'white',
+                theme: 'dark',
+            });
+        } else {
+            loadMoreBtn.classList.remove('hidden');
+            page += 1;
+        }
+        
+        renderFunc(response.data, type);
+    }
+
+    preloader.classList.add('hidden');
 };

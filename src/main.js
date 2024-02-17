@@ -1,3 +1,4 @@
+import Axios from "axios";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
@@ -5,12 +6,14 @@ import {pixebayApi} from "./js/pixebay-api";
 
 
 const form = document.querySelector('.form');
+const loadMoreBtn = document.querySelector('.loadMore');
+let word;
 
 form.addEventListener('submit', e => {
     e.preventDefault();
 
     const target = e.target;
-    const word = target.elements.field.value;
+    word = target.elements.field.value;
 
     if(!word) { 
         iziToast.show({
@@ -19,13 +22,18 @@ form.addEventListener('submit', e => {
             backgroundColor: 'red',
             messageColor: 'white',
             theme: 'dark',
-            iconUrl: '/goit-js-hw-11/assets/error.svg'
         });
     } else { 
-        pixebayApi(word, iziToast);
+        pixebayApi(word, iziToast, Axios, 'loadFirst', loadMoreBtn);
 
         target.reset();
     }
+});
+
+loadMoreBtn.addEventListener('click', e => {
+    e.preventDefault();
+
+    pixebayApi(word, iziToast, Axios, 'NewPage', loadMoreBtn);
 });
 
 
